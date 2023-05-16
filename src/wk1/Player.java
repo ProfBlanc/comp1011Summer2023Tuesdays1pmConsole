@@ -1,3 +1,5 @@
+package wk1;
+
 public class Player {
     private String name;
     private int attack, health;

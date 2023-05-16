@@ -1,0 +1,45 @@
+Game
+    start
+    stop
+    pause
+    save
+    load
+    login
+    logout
+
+    An interface is a list of requirements
+    Declares methods that NEED to be implemented
+
+    Can only contain
+        methods
+        constant values
+    All entities are public
+
+
+Create a concrete class named FightingGame
+    implement Game
+        start, end, stop, pause, resume
+            output message screen
+        login
+            ask for username & password
+                accept admin/pass as uname and pwd
+                pass values to validate method
+        save, load
+            output method not implemented message
+
+
+Create abstract class named Player
+    name
+    attack
+    health
+        private instance variables
+        limitations
+            name: at least 3 chars
+            attack: 3-10
+            health:20-30
+                not met: throw an exception
+    abstract method
+        useSuperPower
+   regular methods
+   increaseAttack
+   decreaseHealth
