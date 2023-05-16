@@ -43,3 +43,24 @@ Create abstract class named Player
    regular methods
    increaseAttack
    decreaseHealth
+
+
+
+Time to finish the game
+
+In FightGame
+    add instance variables
+        Scanner
+        ArrayList of Players
+
+    add methods
+        isGameOver
+        turn
+        fight(): have loop, players will take turns attacking e/o. Call turn()
+
+    default constructor
+        call
+            start()
+            fight()
+    start()
+        ask users for Player info
