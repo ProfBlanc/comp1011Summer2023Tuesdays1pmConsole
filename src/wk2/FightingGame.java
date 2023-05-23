@@ -1,7 +1,10 @@
 package wk2;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 
 public class FightingGame implements Game {
@@ -10,6 +13,8 @@ public class FightingGame implements Game {
     private Scanner input = new Scanner(System.in);
     private ArrayList<Player> players = new ArrayList<>();
     //alt+insert
+
+    private Path rootPath = Path.of("./src/game_data/players");
 
     private void choose(){
 
@@ -27,10 +32,45 @@ public class FightingGame implements Game {
     }
     private void userChoosesGame(){
 
-        //ask user to enter game
+        //ask user to enter game;
 
-        if(load("batman") || load("superman")){
-            
+        String[] playerNames = rootPath.toFile().list();
+        
+
+        System.out.println("Choose a player");
+        int index = 0;
+        for(String player : playerNames){
+            index++;
+            System.out.println(index+ " for " + player.split(".txt")[0]);
+
+
+        }
+        System.out.println("Which player do you choose?");
+        int choice = input.nextInt();
+
+
+
+        //if(load("batman") || load("superman")){
+        if(index <= playerNames.length){
+
+            try {
+                //read file contents
+                List<String> lines = Files.readAllLines(rootPath.resolve(playerNames[choice - 1]));
+                //instantiate both Player objects into ArrayList of Player called players
+
+                Player player = new NormalPlayer(lines.get(0).trim(),
+                        Double.parseDouble(lines.get(1)),
+                        Double.parseDouble(lines.get(2)));
+                System.out.println(player);
+                players.add(player);
+                players.add(player);
+                System.out.println("Finished");
+
+            }
+            catch (Exception e){
+                System.err.println(e);
+            }
+
         }
         else{
             System.out.println("Game wasn't found");
