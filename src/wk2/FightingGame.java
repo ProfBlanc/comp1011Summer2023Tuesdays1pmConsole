@@ -11,33 +11,72 @@ public class FightingGame implements Game {
     private ArrayList<Player> players = new ArrayList<>();
     //alt+insert
 
+    private void choose(){
+
+        System.out.println("Do you want to (S)tart a new game or (L)oad a previous game?");
+        String answer = input.nextLine();
+
+        char firstChar = answer.toLowerCase().charAt(0);
+
+        if(firstChar == 's'){
+            userEntersPlayers();
+        } else if (firstChar == 'l') {
+            userChoosesGame();
+        }
+
+    }
+    private void userChoosesGame(){
+
+        //ask user to enter game
+
+        if(load("batman") || load("superman")){
+            
+        }
+        else{
+            System.out.println("Game wasn't found");
+        }
+
+    }
+    private void userEntersPlayers(){
+        int validPlayers = 0;
+        while(validPlayers < 2){
+            try{
+                System.out.println("Enter Name for Player "  + (validPlayers + 1));
+                String name = input.nextLine();
+                System.out.println("Enter attack for " + name);
+                double attack = input.nextDouble();
+                System.out.println("Enter health for " + name);
+                double health = input.nextDouble();
+                input.nextLine();  //consume nl characater
+
+                players.add(new NormalPlayer(name, attack, health));
+                validPlayers++;
+            }
+            catch (InputMismatchException e){
+                System.out.println("Invalid numerical inputs");
+            }
+            catch (Exception e){
+                System.err.println(e.getMessage());
+            }
+        }
+
+    }
     @Override
     public void start() {
         System.out.println("Welcome to our fighting game");
 
         if(login()){
 
-            int validPlayers = 0;
-            while(validPlayers < 2){
-                try{
-                    System.out.println("Enter Name for Player "  + (validPlayers + 1));
-                    String name = input.nextLine();
-                    System.out.println("Enter attack for " + name);
-                    double attack = input.nextDouble();
-                    System.out.println("Enter health for " + name);
-                    double health = input.nextDouble();
-                    input.nextLine();  //consume nl characater
+            choose();
 
-                    players.add(new NormalPlayer(name, attack, health));
-                    validPlayers++;
-                }
-                catch (InputMismatchException e){
-                    System.out.println("Invalid numerical inputs");
-                }
-                catch (Exception e){
-                    System.err.println(e.getMessage());
-                }
-            }
+            /*
+                Ask user whether they want to START a game or LOAD a game.
+                If Start game, use the while loop
+                If load game, automatically load batman and superman txt file data
+                create objects
+
+             */
+
 
 
         }
