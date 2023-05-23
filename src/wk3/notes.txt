@@ -1,0 +1,8 @@
+File manipulation
+    read and write to files
+    read and list folders
+    game: allow user to load Players
+
+JSON
+    using GSON library
+    save and load json

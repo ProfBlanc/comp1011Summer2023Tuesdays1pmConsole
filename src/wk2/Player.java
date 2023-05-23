@@ -55,4 +55,12 @@ public abstract class Player {
         health -= value;
     }
 
+    @Override
+    public String toString() {
+        return "Player{" +
+                "name='" + name + '\'' +
+                ", attack=" + attack +
+                ", health=" + health +
+                '}';
+    }
 }

@@ -1,12 +1,50 @@
 package wk2;
 
+import java.util.ArrayList;
+import java.util.InputMismatchException;
+import java.util.Scanner;
+
 public class FightingGame implements Game {
 
+
+    private Scanner input = new Scanner(System.in);
+    private ArrayList<Player> players = new ArrayList<>();
     //alt+insert
 
     @Override
     public void start() {
         System.out.println("Welcome to our fighting game");
+
+        if(login()){
+
+            int validPlayers = 0;
+            while(validPlayers < 2){
+                try{
+                    System.out.println("Enter Name for Player "  + (validPlayers + 1));
+                    String name = input.nextLine();
+                    System.out.println("Enter attack for " + name);
+                    double attack = input.nextDouble();
+                    System.out.println("Enter health for " + name);
+                    double health = input.nextDouble();
+                    input.nextLine();  //consume nl characater
+
+                    players.add(new NormalPlayer(name, attack, health));
+                    validPlayers++;
+                }
+                catch (InputMismatchException e){
+                    System.out.println("Invalid numerical inputs");
+                }
+                catch (Exception e){
+                    System.err.println(e.getMessage());
+                }
+            }
+
+
+        }
+        else{
+            System.out.println("Login required");
+        }
+
     }
 
     @Override
@@ -27,7 +65,11 @@ public class FightingGame implements Game {
 
     @Override
     public boolean login() {
-        return false;
+        System.out.println("Enter username");
+        String uname = input.nextLine();
+        System.out.println("Enter password");
+        String pwd = input.nextLine();
+        return validateLogin(uname, pwd);
     }
 
     @Override
@@ -51,5 +93,56 @@ public class FightingGame implements Game {
     public boolean load(String fileName) {
         System.out.println("Not yet implemented");
         return false;
+    }
+
+    @Override
+    public void end(){
+        System.out.println("The game is over! Thanks for playing");
+    }
+
+    private boolean isGameOver(){
+        //iterate through all players. determine if health is lte 0
+
+        for(Player current : players){
+            if(current.getHealth() <= 0)
+                return true;
+        }
+
+        return false;
+
+    }
+
+    private void turn(int attacker){
+
+        int victim = attacker == 0 ? 1 : 0;
+        System.out.printf("%s is attacking %s%n",
+                players.get(attacker).getName(),
+                players.get(victim).getName()
+                );
+
+            players.get(victim).decreaseHealth(players.get(attacker).getAttack());
+
+                System.out.printf("%s health is now %.1f%n",
+                players.get(victim).getName(),
+                players.get(victim).getHealth()
+                );
+        System.out.println("*".repeat(20));
+
+    }
+
+    private void fight(){
+
+        int counter = -1;
+        while(!isGameOver()){
+            counter ++;
+            turn(counter % 2);
+        }
+        end();
+    }
+
+    public FightingGame(){
+
+        start();
+        fight();
     }
 }

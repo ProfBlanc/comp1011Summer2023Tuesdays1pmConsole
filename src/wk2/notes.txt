@@ -54,8 +54,8 @@ In FightGame
         ArrayList of Players
 
     add methods
-        isGameOver
-        turn
+        isGameOver()
+        turn()
         fight(): have loop, players will take turns attacking e/o. Call turn()
 
     default constructor

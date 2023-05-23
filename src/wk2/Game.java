@@ -11,4 +11,6 @@ public interface Game {
     void logout();
     boolean save(String fileName);
     boolean load(String fileName);
+
+    void end();
 }
