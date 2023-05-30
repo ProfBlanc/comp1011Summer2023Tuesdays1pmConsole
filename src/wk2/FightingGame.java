@@ -1,81 +1,140 @@
 package wk2;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class FightingGame implements Game {
 
 
-    private Scanner input = new Scanner(System.in);
+    private final Scanner input = new Scanner(System.in);
     private ArrayList<Player> players = new ArrayList<>();
     //alt+insert
 
-    private Path rootPath = Path.of("./src/game_data/players");
+    private final Path rootPathPlayers = Path.of("./src/game_data/players");
+    private final Path rootPathGames = Path.of("./src/game_data/games");
 
+    private boolean forceGameOver = false;
+
+    private Gson gson;
+
+    private GsonBuilder gsonBuilder = new GsonBuilder();
+
+    private StringBuilder answer = new StringBuilder();
+
+    private void clearAnswer(){
+        answer.setLength(0); //clear all contents
+    }
     private void choose(){
 
         System.out.println("Do you want to (S)tart a new game or (L)oad a previous game?");
-        String answer = input.nextLine();
+        clearAnswer();
+        answer.append(input.nextLine());
 
-        char firstChar = answer.toLowerCase().charAt(0);
+        char firstChar = answer.toString().toLowerCase().charAt(0);
 
         if(firstChar == 's'){
             userEntersPlayers();
         } else if (firstChar == 'l') {
-            userChoosesGame();
+            //userChoosesGame();
+            userChoosesGameOrPlayer();
         }
 
     }
-    private void userChoosesGame(){
+    private void userChoosesGameOrPlayer(){
+
+        System.out.println("Do you want to load a (G)ame or load (P)layers?");
+        clearAnswer();
+        answer.append(input.nextLine());
+        if(answer.toString().equalsIgnoreCase("g")){
+            userChoosesGames();
+        }
+        else if(answer.toString().equalsIgnoreCase("p")){
+            userChoosesPlayers();
+        }
+
+    }
+    private void userChoosesGames(){
+
+        //list all games
+
+        //load the one game
+
+        try{
+
+            List<String> data = Files.readAllLines(rootPathGames.resolve("Game_Batman_vs_Superman.txt"));
+            players.add(gson.fromJson(data.get(0), NormalPlayer.class));
+            players.add(gson.fromJson(data.get(1), NormalPlayer.class));
+
+        }
+        catch (Exception e){
+            System.err.println(e);
+        }
+
+
+
+    }
+    private void userChoosesPlayers() {
 
         //ask user to enter game;
 
-        String[] playerNames = rootPath.toFile().list();
-        
+        String[] playerNames = rootPathPlayers.toFile().list();
 
-        System.out.println("Choose a player");
+        int validPlayers = 0;
+        while (validPlayers < 2){
+        System.out.println("Choose a player " + (validPlayers + 1));
         int index = 0;
-        for(String player : playerNames){
+        for (String player : Objects.requireNonNull(playerNames)) {
             index++;
-            System.out.println(index+ " for " + player.split(".txt")[0]);
+            System.out.println(index + " for " + player.split(".txt")[0]);
 
 
         }
         System.out.println("Which player do you choose?");
-        int choice = input.nextInt();
+           answer.append(input.nextLine());
 
-
-
-        //if(load("batman") || load("superman")){
-        if(index <= playerNames.length){
-
-            try {
-                //read file contents
-                List<String> lines = Files.readAllLines(rootPath.resolve(playerNames[choice - 1]));
-                //instantiate both Player objects into ArrayList of Player called players
-
-                Player player = new NormalPlayer(lines.get(0).trim(),
-                        Double.parseDouble(lines.get(1)),
-                        Double.parseDouble(lines.get(2)));
-                System.out.println(player);
-                players.add(player);
-                players.add(player);
-                System.out.println("Finished");
+            try{
+                int choice = Integer.parseInt(answer.toString());
+                System.out.println(choice);
+                if (index <= playerNames.length && loadDataFile(playerNames[choice - 1])) {
+                validPlayers++;
+                }
 
             }
             catch (Exception e){
-                System.err.println(e);
+
+                if(load(answer.toString().trim() + ".txt") && loadDataFile(answer.toString().trim() + ".txt" ) ) {
+
+                    validPlayers++;
+                }
+
             }
 
+
+        //if(load("batman") || load("superman")){
+    }
+
+    }
+
+    private boolean loadDataFile(String fileName){
+        int playerSize = players.size();
+        try {
+            List<String> lines = Files.readAllLines(rootPathPlayers.resolve(fileName));
+            //instantiate both Player objects into ArrayList of Player called players
+
+            players.add(new NormalPlayer(lines.get(0).trim(),
+                    Double.parseDouble(lines.get(1)),
+                    Double.parseDouble(lines.get(2))));
         }
-        else{
-            System.out.println("Game wasn't found");
+        catch (Exception e){
+            System.err.println("Could not load file " + fileName);
+
         }
 
+        return players.size() != playerSize;
     }
     private void userEntersPlayers(){
         int validPlayers = 0;
@@ -87,7 +146,7 @@ public class FightingGame implements Game {
                 double attack = input.nextDouble();
                 System.out.println("Enter health for " + name);
                 double health = input.nextDouble();
-                input.nextLine();  //consume nl characater
+                input.nextLine();  //consume nl character
 
                 players.add(new NormalPlayer(name, attack, health));
                 validPlayers++;
@@ -116,9 +175,6 @@ public class FightingGame implements Game {
                 create objects
 
              */
-
-
-
         }
         else{
             System.out.println("Login required");
@@ -163,15 +219,22 @@ public class FightingGame implements Game {
     }
 
     @Override
-    public boolean save(String fileName) {
-        System.out.println("Not yet implemented");
-        return false;
+    public boolean save(Path path, String content) {
+
+        try{
+            Files.writeString(path, content);
+            return true;
+        }
+        catch(Exception e){
+            System.err.println(e);
+            return false;
+        }
+
     }
 
     @Override
     public boolean load(String fileName) {
-        System.out.println("Not yet implemented");
-        return false;
+        return rootPathPlayers.resolve(fileName).toFile().exists();
     }
 
     @Override
@@ -187,7 +250,7 @@ public class FightingGame implements Game {
                 return true;
         }
 
-        return false;
+        return forceGameOver;
 
     }
 
@@ -205,10 +268,43 @@ public class FightingGame implements Game {
                 players.get(victim).getName(),
                 players.get(victim).getHealth()
                 );
-        System.out.println("*".repeat(20));
 
+        separator();
+        askUserWhatToDoNext();
+        separator();
     }
 
+    private void askUserWhatToDoNext(){
+
+        System.out.println("Do you want to save the game?");
+        String answer = input.nextLine();
+        if(answer.toLowerCase().charAt(0) == 'y'){
+
+            //save the game
+            //path, filename, contents
+
+            String filename = String.format("Game_%s_vs_%s.txt", players.get(0).getName(), players.get(1).getName());
+
+            String value1 = gson.toJson(players.get(0));
+            String value2 = gson.toJson(players.get(1));
+            String content = String.format("%s%n%s", value1, value2);
+
+            if(save(rootPathGames.resolve(filename), content)){
+
+                System.out.println("Game Saved");
+                //exit the fight
+                forceGameOver = true;
+            }
+            else{
+                System.out.println("Could not save the game");
+            }
+
+
+        }
+    }
+    private void separator(){
+        System.out.println("*".repeat(20));
+    }
     private void fight(){
 
         int counter = -1;
@@ -221,6 +317,7 @@ public class FightingGame implements Game {
 
     public FightingGame(){
 
+        gson = gsonBuilder.create();
         start();
         fight();
     }

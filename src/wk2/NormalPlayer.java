@@ -10,8 +10,9 @@ public class NormalPlayer extends Player{
 
         Scanner ask questions
      */
+
     private boolean hasUsedSuperPower;
-    private Scanner input = new Scanner(System.in);
+    private transient Scanner input = new Scanner(System.in);
 
 
     public NormalPlayer() {
@@ -43,5 +44,10 @@ public class NormalPlayer extends Player{
             }
         }
 
+    }
+
+    @Override
+    public String toString(){
+        return super.toString() + ", hasUsedSuperPower = " + hasUsedSuperPower;
     }
 }
